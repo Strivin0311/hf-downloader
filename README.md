@@ -35,11 +35,11 @@ A repo to manage the downloaded resources from huggingface including model shard
 #### Download model(s):
 
 * To download a model, you only have to:
-  * step1: search the [huggingface model hub](https://huggingface.co/models/) for the model name `source/my_model_name` you want
-  * step2: pick the directory `path/to/my_save_dir` you want to save it relative to the root directory `HF_MODEL_ROOT` set in the `.env` as an enviromental variable:
-  * step3: then simply run the command below, and you can wait until the model is successfully downloaded to the directory `HF_MODEL_ROOT/path/to/my_save_dir` and logged into `./log/model_downloaded.json`:
+  * step1: search the [huggingface model hub](https://huggingface.co/models/) for the model name `source/to/model_name` you want
+  * step2: pick the directory `path/to/save_dir` you want to save it relative to the root directory `HF_MODEL_ROOT` set in the `.env` as an enviromental variable:
+  * step3: then simply run the command below, and you can wait until the model is successfully downloaded to the directory `HF_MODEL_ROOT/path/to/save_dir/source/to/model_name` and logged into `./log/model_downloaded.json`:
     ```sh
-    python src/download_model.py --model_name `source/my_model_name` --save_dir `path/to/my_save_dir`
+    python src/download_model.py --model_name `source/to/model_name` --save_dir `path/to/save_dir`
     ```
   * you can also refer to the more arguments usage in the demo scripts like `script/demo_download_xxx.sh`
   * and the model config template can be found in `config/model_config_template.json`
