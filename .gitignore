@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 .env
-.log/*.json
+./log/*.json
 
 # C extensions
 *.so
