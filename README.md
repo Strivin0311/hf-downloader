@@ -5,6 +5,11 @@ A repo to manage the downloaded resources from huggingface including model shard
 
 #### Preparation:
 
+* Above all, make sure your local machine can access to huggingface by simply pinging huggingface below (*If not, get a VPN and try again*):
+  ```sh
+  ping huggingface.co/
+  ```
+
 * Creat the `.env` file to set some specific environment variables, which needs the python package `dotenv` installed by pip below:
   ```sh
   pip install -U python-dotenv
@@ -25,9 +30,9 @@ A repo to manage the downloaded resources from huggingface including model shard
   ```sh
   pip install -U huggingface_hub
   ```
-* For faster download, we also use the tool [hf_transfer](https://huggingface.co/docs/huggingface_hub/v0.19.3/package_reference/environment_variables#hfhubenablehftransfer) to speed up file transfers, which can be installed by pip as below, with the only environment variable to set `.env`:
+* For faster download, there's another Rust-based tool [hf_transfer](https://huggingface.co/docs/huggingface_hub/v0.19.3/package_reference/environment_variables#hfhubenablehftransfer) to maximize the bandwidth used by dividing large files into smaller parts and transferring them simultaneously using multiple threads, but it lacks several user-friendly features such as resumable downloads and proxies, and sometimes it 's not as stable as the native `from_pretrained` single-thread way especially when your access to huggingface is not directly allowed. If you are running on a machine with high bandwidth to directly access to huggingface, you can increase your download speed with it by simply installing with pip and set the environment variable in the `.env` as below:
   ```sh
-  pip install -U hf_transfer
+  pip install -U hf-transfer
   HF_HUB_ENABLE_HF_TRANSFER=1
   ```
 * To perminently store the resources, we've already kept the argument for the huggingface_hub functions `local_dir_use_symlinks=False` in the source code to disable the symlinks from the cache system

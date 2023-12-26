@@ -1,9 +1,9 @@
 {
+    "download_mode": "",
     "model_name": "",
     "file_name": "",
     "version": "",
     "save_dir": "",
     "allow_patterns": [],
-    "ignore_patterns": [],
-    "auth_token": ""
+    "ignore_patterns": []
 }
