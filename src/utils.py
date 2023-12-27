@@ -63,5 +63,5 @@ def get_proxies_dict(proxies: str) -> Dict[str, str]:
 
 def get_order_str(order_num: int) -> str:
     orderstr_dict = {-1: " ", 0: " 1st ", 1: " 2nd ", 2: " 3rd "}
-    order_str = orderstr_dict.get(order_num, ' '+str(order_num)+'th ')
+    order_str = orderstr_dict.get(order_num, ' '+str(order_num+1)+'th ')
     return order_str
