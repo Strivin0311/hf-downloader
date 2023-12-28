@@ -74,19 +74,21 @@ def download(config_dict: dict, idx=-1, max_retry=0):
             if config['download_mode'] == "necessary": # to download necessary files from the model repo to load tokenizer and pretrained model
                 tokenizer = AutoTokenizer.from_pretrained(
                     config['model_name'],
-                    revision=config['version'] if config['version'] not in ["", "latest"] else None,
+                    revision=config['version'] if config['version'] not in ["", "latest"] else 'main',
                     proxies=hf_proxies,
                     token=hf_auth_token,
                     resume_download=True,
+                    trust_remote_code=True,
                 )
                 tokenizer.save_pretrained(config['save_dir'])
 
                 model = AutoModel.from_pretrained(
                     config['model_name'], 
-                    revision=config['version'] if config['version'] not in ["", "latest"] else None,
+                    revision=config['version'] if config['version'] not in ["", "latest"] else 'main',
                     proxies=hf_proxies,
                     token=hf_auth_token,
                     resume_download=True,
+                    trust_remote_code=True,
                 )
                 model.save_pretrained(config['save_dir'])
             elif config['download_mode'] == "specific": # to download specific files from the model repo
@@ -94,7 +96,7 @@ def download(config_dict: dict, idx=-1, max_retry=0):
                     repo_type='model',
                     repo_id=config['model_name'], 
                     filename=config['file_name'], 
-                    revision=config['version'] if config['version'] != "" else None,
+                    revision=config['version'] if config['version'] != "" else 'main',
                     proxies=hf_proxies,
                     token=hf_auth_token,
                     resume_download=True,
@@ -105,7 +107,7 @@ def download(config_dict: dict, idx=-1, max_retry=0):
                 snapshot_download(
                     repo_type='model',
                     repo_id=config['model_name'],
-                    revision=config['version'] if config['version'] not in ["", "latest"] else None,
+                    revision=config['version'] if config['version'] not in ["", "latest"] else 'main',
                     allow_patterns=config['allow_patterns'] if config['allow_patterns'] != [] else None,
                     ignore_patterns=config['ignore_patterns'] if config['ignore_patterns'] != [] else None,
                     proxies=hf_proxies,

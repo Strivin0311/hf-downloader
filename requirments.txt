@@ -1,0 +1,7 @@
+python-dotenv
+transformers
+datasets
+huggingface_hub
+hf-transfer
+protobuf
+sentencepiece

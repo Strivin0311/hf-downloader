@@ -62,3 +62,8 @@ A repo to manage the downloaded resources from huggingface including model shard
   ```sh
   
   ```
+
+
+#### Convert any model to Safetensors and open a PR
+
+[here](https://huggingface.co/spaces/safetensors/convert)
