@@ -52,7 +52,8 @@ def print_model_info(model, model_path):
     print("="*50, '\n',f"The maximum training context length of this model is: {context_len}")
     
     # FIXME: for statistics in our own table
-    print("="*50, '\n', f"Summary:\n |{get_model_name_from_path(model_path)}|{get_model_base_from_path(model_path, model_root)}|{retrieve_highest(param_size, precision=1)}|{retrieve_highest(disk_size, precision=1)}|{retrieve_highest(mem_size_dict['sum'], precision=1)}|{format_context_len(context_len) if context_len != 'UNKNOWN' else context_len}|[here]('{model_path}')|[here]('{hf_mirror}')|")
+    print("="*50, '\n', f"Summary:\n |{get_model_name_from_path(model_path)}|{get_model_base_from_path(model_path, model_root)}|{retrieve_highest(param_size, precision=1)}|{retrieve_highest(disk_size, precision=1)}|{retrieve_highest(mem_size_dict['sum'], precision=1)}|{format_context_len(context_len) if context_len != 'UNKNOWN' else context_len}|'{model_path}'|[here]({hf_mirror})|")
+
 
 def text_generation(model, tokenizer, num_gpus):
     # test basic text generation task with model.generation()
@@ -115,7 +116,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="load one downloaded model to get its basic information and test it on some basic tasks")
+
     parser.add_argument("--model_path", type=str, required=True, help="The relative path to the downloaded model under the model root set in the '.env'")
+
     parser.add_argument("--model_type", type=str, default="clm", choices=['clm', 'mlm', 'seq2seq'], 
                         help="The type of the model, default is 'clm' for causal language models like GPT, while 'mlm' is for maksed language models like BERT and 'seq2seq' is for sequence-to-sequence models like T5, BART")
 

@@ -19,6 +19,10 @@ def transfer(data_dir):
             subprocess.run(["unzip", file_path])
         elif new_filename.endswith(".tar"):
             subprocess.run(["tar", "-xvf", file_path])
+        elif new_filename.endswith(".tar.gz"):
+            subprocess.run(["tar", "-xzvf", file_path])
+        elif new_filename.endswith(".zst"):
+            subprocess.run(["zstd", "-d", file_path])
 
 
 if __name__ == "__main__":
