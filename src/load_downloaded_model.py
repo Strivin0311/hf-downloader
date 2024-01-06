@@ -18,8 +18,9 @@ def set_available_gpus(gpus_list):
     if gpus_list is None: return
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str,gpus_list))
 
-def load_model_and_tokenizer(model_path, model_type, num_gpus=1):
-    from transformers import AutoTokenizer, AutoModel, AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoModelForMaskedLM
+def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=None):
+    from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoModelForMaskedLM
+    from peft import PeftModel
 
     model_load_class = {
         'mlm': AutoModelForMaskedLM,
@@ -30,11 +31,17 @@ def load_model_and_tokenizer(model_path, model_type, num_gpus=1):
     # load model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     print(f"The tokenizer meta information is shown as below: \n{tokenizer}\n")
-    if num_gpus > 1:
-        model = model_load_class.from_pretrained(model_path, device_map='auto', trust_remote_code=True)
-    else: 
-        model = model_load_class.from_pretrained(model_path, trust_remote_code=True)
-        if num_gpus == 1: model = model.cuda()
+
+    
+    model = model_load_class.from_pretrained(
+        model_path, 
+        device_map='auto' if num_gpus > 1 else ({"":"cuda"} if num_gpus == 1 else None), 
+        trust_remote_code=True
+    )
+
+    if peft_path is not None: # load the base model with the peft adapter weights under the peft_path
+        peft_path = os.path.join(model_path, peft_path)
+        model = PeftModel.from_pretrained(model, peft_path, is_trainable=False)
 
     print(f"The model structure is shown as below: \n{model}\n")
 
@@ -53,7 +60,6 @@ def print_model_info(model, model_path):
     
     # FIXME: for statistics in our own table
     print("="*50, '\n', f"Summary:\n |{get_model_name_from_path(model_path)}|{get_model_base_from_path(model_path, model_root)}|{retrieve_highest(param_size, precision=1)}|{retrieve_highest(disk_size, precision=1)}|{retrieve_highest(mem_size_dict['sum'], precision=1)}|{format_context_len(context_len) if context_len != 'UNKNOWN' else context_len}|'{model_path}'|[here]({hf_mirror})|")
-
 
 def text_generation(model, tokenizer, num_gpus):
     # test basic text generation task with model.generation()
@@ -102,7 +108,7 @@ def main(args):
 
     set_available_gpus(args.devices)
 
-    model, tokenizer = load_model_and_tokenizer(model_path, args.model_type, len(args.devices))
+    model, tokenizer = load_model_and_tokenizer(model_path, args.model_type, len(args.devices), args.peft_path)
 
     print_model_info(model, model_path)
 
@@ -119,7 +125,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_path", type=str, required=True, help="The relative path to the downloaded model under the model root set in the '.env'")
 
-    parser.add_argument("--model_type", type=str, default="clm", choices=['clm', 'mlm', 'seq2seq'], 
+    parser.add_argument("--model_type", type=str, default="clm", choices=['clm', 'mlm', 'seq2seq',], 
                         help="The type of the model, default is 'clm' for causal language models like GPT, while 'mlm' is for maksed language models like BERT and 'seq2seq' is for sequence-to-sequence models like T5, BART")
 
     parser.add_argument("--devices", type=str, nargs='*', default='0', 
@@ -128,6 +134,8 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, default="text_generation", 
                         choices=['text_generation', 'chatbot'], 
                         help="The available task to use the model, default is 'text_generation'")
+
+    parser.add_argument("--peft_path", type=str, default="", help="The relative path pointing to the peft config file or the directory containing it under the model repo if this is a peft model")
 
     args = parser.parse_args()
 
