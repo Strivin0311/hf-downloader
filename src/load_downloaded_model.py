@@ -18,7 +18,7 @@ def set_available_gpus(gpus_list):
     if gpus_list is None: return
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str,gpus_list))
 
-def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=None):
+def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=""):
     from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoModelForMaskedLM
     from peft import PeftModel
 
@@ -39,7 +39,7 @@ def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=None)
         trust_remote_code=True
     )
 
-    if peft_path is not None: # load the base model with the peft adapter weights under the peft_path
+    if peft_path != "": # load the base model with the peft adapter weights under the peft_path
         peft_path = os.path.join(model_path, peft_path)
         model = PeftModel.from_pretrained(model, peft_path, is_trainable=False)
 
