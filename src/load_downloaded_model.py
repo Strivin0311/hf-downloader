@@ -19,7 +19,9 @@ def set_available_gpus(gpus_list):
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str,gpus_list))
 
 def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=""):
+    import torch
     from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoModelForMaskedLM
+    from transformers import LlamaForCausalLM, LlamaTokenizer
     from peft import PeftModel
 
     model_load_class = {
@@ -29,14 +31,20 @@ def load_model_and_tokenizer(model_path, model_type, num_gpus=1, peft_path=""):
     }[model_type]
 
     # load model and tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    except Exception as e: # FIXME: the legacy problem with the llama tokenizer
+        if 'llama' in model_path:
+            tokenizer = LlamaTokenizer.from_pretrained(model_path)
+        else: raise e
     print(f"The tokenizer meta information is shown as below: \n{tokenizer}\n")
 
     
     model = model_load_class.from_pretrained(
         model_path, 
         device_map='auto' if num_gpus > 1 else ({"":"cuda"} if num_gpus == 1 else None), 
-        trust_remote_code=True
+        trust_remote_code=True,
+        torch_dtype=torch.float16
     )
 
     if peft_path != "": # load the base model with the peft adapter weights under the peft_path
@@ -81,7 +89,7 @@ def text_generation(model, tokenizer, num_gpus):
                                 pad_token_id=tokenizer.eos_token_id # for open-ending generation
                                 )
         print(f"The outputs from the model generation is: \n{outputs}")
-        output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+        output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0][len(input_text):]
         print(f"The final output text is: \n{output_text}")
         print("="*50+"\n")
 
