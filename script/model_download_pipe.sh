@@ -1,11 +1,17 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=WizardLM/WizardCoder-Python-7B-V1.0
+MODEL_NAME=WizardLM/WizardMath-7B-V1.0
 SAVE_DIR=llama2/wizard
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=2
+NUM_MODEL_SHARDS=3
 MODEL_FILE_FORMAT=bin
+
+# the default setting that you don't need to change for the most cases
+MODEL_TYPE=clm
+TASK="text_generation"
+DEVICES="0"
+PEFT_PATH=""
 
 
 ## 1. download the non model files with only one process and only 10 times for retrying (enough)
@@ -25,7 +31,7 @@ for i in $(seq 1 $NUM_MODEL_SHARDS); do
     --save_dir $SAVE_DIR \
     --download_mode all \
     --allow_patterns "pytorch_model-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}" \
-    --max_retry 30 \
+    --max_retry 50 \
     &
 done
 
@@ -33,3 +39,14 @@ done
 wait
 
 echo "All model shards from idx 1 to ${NUM_MODEL_SHARDS} are downloads."
+
+
+## 3. loaded the downloaded model
+
+echo "Loading the downloaded model automatically..."
+
+python src/load_downloaded_model.py \
+--model_path "${SAVE_DIR}/${MODEL_NAME}" \
+--model_type $MODEL_TYPE \
+--task $TASK \
+--devices $DEVICES \
