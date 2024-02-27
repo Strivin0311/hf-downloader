@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=WizardLM/WizardMath-7B-V1.0
-SAVE_DIR=llama2/wizard
+MODEL_NAME=mosaicml/mpt-7b-storywriter
+SAVE_DIR=mpt
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=3
+NUM_MODEL_SHARDS=2
 MODEL_FILE_FORMAT=bin
 
 # the default setting that you don't need to change for the most cases

@@ -5,6 +5,9 @@ __pycache__/
 
 .env
 log/*.json
+data/
+test/
+
 
 # C extensions
 *.so
