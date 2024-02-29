@@ -56,6 +56,14 @@ A repo to manage the downloaded resources from huggingface including model shard
     python src/download_model.py --from_config
     ```
 
+* (Easiest) Or you can use the most stable pipeline script `./script/model_download_pipe.sh`, and the few variables you need to set are (taking `chatglm3-6b-128k` as an example), then you can just run the script to download all of the necessary files of the model you want from the hf hub:
+  ```sh
+  MODEL_NAME=THUDM/chatglm3-6b-128k
+  SAVE_DIR=chatglm
+  NUM_MODEL_SHARDS=7
+  MODEL_FILE_FORMAT=bin
+  ```
+
 #### Download dataset(s):
 
 * To download a dataset:
