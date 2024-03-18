@@ -59,6 +59,7 @@ def downloaded_log(config, elapsed_time):
     downloaded_logs['models'] = [config] + downloaded_logs['models']
     
     with open(model_downloaded_log_path, 'w', encoding='utf-8') as f:
+        print(f"model_downloaded_log_path: {model_downloaded_log_path}")
         json.dump(downloaded_logs, f)
 
 def download(config_dict: dict, idx=-1, max_retry=0):
