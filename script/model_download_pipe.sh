@@ -1,11 +1,21 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=THUDM/chatglm3-6b-128k
-SAVE_DIR=chatglm
+MODEL_NAME=deepseek-ai/deepseek-coder-33b-instruct
+SAVE_DIR=llama2/deepseek
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
 NUM_MODEL_SHARDS=7
-MODEL_FILE_FORMAT=bin
+MODEL_FILE_FORMAT=safetensors
+
+# set prefix for model weights according to the model file format
+if [ "$MODEL_FILE_FORMAT" = "safetensors" ]; then
+    WEIGHT_PREFIX="model"
+elif [ "$MODEL_FILE_FORMAT" = "bin" ]; then
+    WEIGHT_PREFIX="pytorch_model"
+else
+    echo "Unknown model file format: $MODEL_FILE_FORMAT"
+    exit 1
+fi
 
 # the default setting that you don't need to change for the most cases
 MODEL_TYPE=clm
@@ -30,7 +40,7 @@ for i in $(seq 1 $NUM_MODEL_SHARDS); do
     --model_name $MODEL_NAME \
     --save_dir $SAVE_DIR \
     --download_mode all \
-    --allow_patterns "pytorch_model-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}" \
+    --allow_patterns "$WEIGHT_PREFIX-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}" \
     --max_retry 50 \
     &
 done
