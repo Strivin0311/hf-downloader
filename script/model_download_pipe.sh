@@ -1,10 +1,11 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=deepseek-ai/deepseek-coder-33b-instruct
-SAVE_DIR=llama2/deepseek
+MODEL_NAME=mistralai/Mistral-7B-v0.1
+SAVE_DIR=mistral
+
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=7
+NUM_MODEL_SHARDS=2
 MODEL_FILE_FORMAT=safetensors
 
 # set prefix for model weights according to the model file format
@@ -23,6 +24,11 @@ TASK="text_generation"
 DEVICES="0"
 PEFT_PATH=""
 
+if [ $NUM_MODEL_SHARDS -eq 1 ]; then
+    ALLOW_PATTERNS="$WEIGHT_PREFIX.${MODEL_FILE_FORMAT}"
+else
+    ALLOW_PATTERNS="$WEIGHT_PREFIX-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}"
+fi
 
 ## 1. download the non model files with only one process and only 10 times for retrying (enough)
 python src/download_model.py \
