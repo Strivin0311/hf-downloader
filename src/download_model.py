@@ -8,11 +8,10 @@ import transformers
 from transformers import AutoTokenizer, AutoModel
 from huggingface_hub import hf_hub_download, snapshot_download
 
-
 from utils import get_dir_size, add_size_str, update_config_dict, get_proxies_dict, get_order_str
 
-from dotenv import load_dotenv
-load_dotenv(".env")
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 ## load some environment variables
 model_root = os.getenv('HF_MODEL_ROOT')

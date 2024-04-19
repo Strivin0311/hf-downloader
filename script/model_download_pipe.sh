@@ -23,6 +23,11 @@ TASK="text_generation"
 DEVICES="2"
 PEFT_PATH=""
 
+if [ $NUM_MODEL_SHARDS -eq 1 ]; then
+    ALLOW_PATTERNS="$WEIGHT_PREFIX.${MODEL_FILE_FORMAT}"
+else
+    ALLOW_PATTERNS="$WEIGHT_PREFIX-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}"
+fi
 
 ## 1. download the non model files with only one process and only 10 times for retrying (enough)
 python src/download_model.py \
