@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=deepseek-ai/deepseek-coder-33b-instruct
-SAVE_DIR=llama2/deepseek
+MODEL_NAME=unsloth/llama-3-8b-Instruct
+SAVE_DIR=llama3
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=7
+NUM_MODEL_SHARDS=4
 MODEL_FILE_FORMAT=safetensors
 
 # set prefix for model weights according to the model file format
@@ -20,7 +20,7 @@ fi
 # the default setting that you don't need to change for the most cases
 MODEL_TYPE=clm
 TASK="text_generation"
-DEVICES="0"
+DEVICES="2"
 PEFT_PATH=""
 
 
