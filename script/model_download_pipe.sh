@@ -40,12 +40,17 @@ python src/download_model.py \
 echo "All non-model files are downloaded, including ${NON_MODEL_FILE_PATTERNS}."
 
 ## 2. download the model files with multiple processes and 30 times for retrying (sometimes may not enough)
+FORMATED_NUM_SHARDS=$(printf "%05d\n" $NUM_MODEL_SHARDS)
+
 for i in $(seq 1 $NUM_MODEL_SHARDS); do
+
+    FORMATED_IDX=$(printf "%05d\n" $i)
+
     python src/download_model.py \
     --model_name $MODEL_NAME \
     --save_dir $SAVE_DIR \
     --download_mode all \
-    --allow_patterns "$WEIGHT_PREFIX-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}" \
+    --allow_patterns "$WEIGHT_PREFIX-${FORMATED_IDX}-of-${FORMATED_NUM_SHARDS}.${MODEL_FILE_FORMAT}" \
     --max_retry 50 \
     &
 done
@@ -56,12 +61,12 @@ wait
 echo "All model shards from idx 1 to ${NUM_MODEL_SHARDS} are downloads."
 
 
-## 3. loaded the downloaded model
+# ## 3. loaded the downloaded model
 
-echo "Loading the downloaded model automatically..."
+# echo "Loading the downloaded model automatically..."
 
-python src/load_downloaded_model.py \
---model_path "${SAVE_DIR}/${MODEL_NAME}" \
---model_type $MODEL_TYPE \
---task $TASK \
---devices $DEVICES \
+# python src/load_downloaded_model.py \
+# --model_path "${SAVE_DIR}/${MODEL_NAME}" \
+# --model_type $MODEL_TYPE \
+# --task $TASK \
+# --devices $DEVICES \
