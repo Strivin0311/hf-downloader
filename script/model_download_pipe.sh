@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=unsloth/llama-3-8b-Instruct
+MODEL_NAME=meta-llama/Meta-Llama-3.1-405B-Instruct
 SAVE_DIR=llama3
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=4
+NUM_MODEL_SHARDS=191
 MODEL_FILE_FORMAT=safetensors
 
 # set prefix for model weights according to the model file format
@@ -23,12 +23,6 @@ TASK="text_generation"
 DEVICES="2"
 PEFT_PATH=""
 
-if [ $NUM_MODEL_SHARDS -eq 1 ]; then
-    ALLOW_PATTERNS="$WEIGHT_PREFIX.${MODEL_FILE_FORMAT}"
-else
-    ALLOW_PATTERNS="$WEIGHT_PREFIX-0000${i}-of-0000${NUM_MODEL_SHARDS}.${MODEL_FILE_FORMAT}"
-fi
-
 ## 1. download the non model files with only one process and only 10 times for retrying (enough)
 python src/download_model.py \
 --model_name $MODEL_NAME \
@@ -40,17 +34,29 @@ python src/download_model.py \
 echo "All non-model files are downloaded, including ${NON_MODEL_FILE_PATTERNS}."
 
 ## 2. download the model files with multiple processes and 30 times for retrying (sometimes may not enough)
+
 FORMATED_NUM_SHARDS=$(printf "%05d\n" $NUM_MODEL_SHARDS)
 
-for i in $(seq 1 $NUM_MODEL_SHARDS); do
+START_SHARD_IDX=1
+END_SHARD_IDX=191
 
-    FORMATED_IDX=$(printf "%05d\n" $i)
+if [[ $END_SHARD_IDX -gt $NUM_MODEL_SHARDS ]]; then
+    END_SHARD_IDX=$NUM_MODEL_SHARDS
+fi
+
+for i in $(seq $START_SHARD_IDX $END_SHARD_IDX); do
+    if [ $NUM_MODEL_SHARDS -eq 1 ]; then
+        ALLOW_PATTERNS="$WEIGHT_PREFIX.${MODEL_FILE_FORMAT}"
+    else
+        FORMATED_IDX=$(printf "%05d\n" $i)
+        ALLOW_PATTERNS="$WEIGHT_PREFIX-${FORMATED_IDX}-of-${FORMATED_NUM_SHARDS}.${MODEL_FILE_FORMAT}"
+    fi
 
     python src/download_model.py \
     --model_name $MODEL_NAME \
     --save_dir $SAVE_DIR \
     --download_mode all \
-    --allow_patterns "$WEIGHT_PREFIX-${FORMATED_IDX}-of-${FORMATED_NUM_SHARDS}.${MODEL_FILE_FORMAT}" \
+    --allow_patterns $ALLOW_PATTERNS \
     --max_retry 50 \
     &
 done
@@ -58,7 +64,7 @@ done
 # Wait for all model shard downloading processes to finish
 wait
 
-echo "All model shards from idx 1 to ${NUM_MODEL_SHARDS} are downloads."
+echo "All model shards from idx ${START_SHARD_IDX} to ${END_SHARD_IDX} are downloads."
 
 
 # ## 3. loaded the downloaded model
