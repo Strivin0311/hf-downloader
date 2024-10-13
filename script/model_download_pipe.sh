@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # the specific information for the model you want to download from huggingface hub
-MODEL_NAME=meta-llama/Meta-Llama-3.1-405B-Instruct
-SAVE_DIR=llama3
+MODEL_NAME=meta-llama/Llama-2-7b-hf
+SAVE_DIR=llama2
 NON_MODEL_FILE_PATTERNS="*.md *.json *.py *.model"
-NUM_MODEL_SHARDS=191
+NUM_MODEL_SHARDS=2
 MODEL_FILE_FORMAT=safetensors
 
 # set prefix for model weights according to the model file format
@@ -20,7 +20,7 @@ fi
 # the default setting that you don't need to change for the most cases
 MODEL_TYPE=clm
 TASK="text_generation"
-DEVICES="2"
+DEVICES="0"
 PEFT_PATH=""
 
 ## 1. download the non model files with only one process and only 10 times for retrying (enough)
@@ -38,7 +38,7 @@ echo "All non-model files are downloaded, including ${NON_MODEL_FILE_PATTERNS}."
 FORMATED_NUM_SHARDS=$(printf "%05d\n" $NUM_MODEL_SHARDS)
 
 START_SHARD_IDX=1
-END_SHARD_IDX=191
+END_SHARD_IDX=$NUM_MODEL_SHARDS
 
 if [[ $END_SHARD_IDX -gt $NUM_MODEL_SHARDS ]]; then
     END_SHARD_IDX=$NUM_MODEL_SHARDS
@@ -67,12 +67,12 @@ wait
 echo "All model shards from idx ${START_SHARD_IDX} to ${END_SHARD_IDX} are downloads."
 
 
-# ## 3. loaded the downloaded model
+## 3. loaded the downloaded model
 
-# echo "Loading the downloaded model automatically..."
+echo "Loading the downloaded model automatically..."
 
-# python src/load_downloaded_model.py \
-# --model_path "${SAVE_DIR}/${MODEL_NAME}" \
-# --model_type $MODEL_TYPE \
-# --task $TASK \
-# --devices $DEVICES \
+python src/load_downloaded_model.py \
+--model_path "${SAVE_DIR}/${MODEL_NAME}" \
+--model_type $MODEL_TYPE \
+--task $TASK \
+--devices $DEVICES \

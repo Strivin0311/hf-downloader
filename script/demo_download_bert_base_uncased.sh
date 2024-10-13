@@ -1,1 +1,0 @@
-python src/download_model.py --model_name bert-base-uncased --save_dir bert
