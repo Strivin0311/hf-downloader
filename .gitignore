@@ -1,6 +1,7 @@
 # self to ignore
 dataset
 model
+*_tmp.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
